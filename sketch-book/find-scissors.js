@@ -1,5 +1,6 @@
 import canvasSketch from 'canvas-sketch'
 import random from 'canvas-sketch-util/random'
+const colorPalatte = require('nice-color-palettes')
 
 
 const DIMENSIONS = [ 595, 842 ]
@@ -22,8 +23,10 @@ const drawX = (context, strokeStyle = 'rgba(100, 100, 100, 0.3)') => {
   context.closePath()
 }
 
-const drawScissors = context => {
-  drawX(context, 'rgba(100, 100, 100)')
+const drawScissors = (context, colors) => {
+  const color = random.pick(colors)
+  drawX(context, color)
+  context.strokeStyle = color
   context.beginPath()
   context.arc(unitSize / 2, unitSize, unitSize / 2, - Math.PI, 0)
   context.stroke()
@@ -33,7 +36,11 @@ const drawScissors = context => {
 const sketch = () => {
   // const seed = Math.random() * 99
   const seed = 33.44709456371453
-  random.setSeed(seed)
+  const randomInstance = random.createRandom(seed)
+
+  const colorPalatteSeed = Math.round(Math.random() * 100)
+  const colors = colorPalatte[colorPalatteSeed]
+
   return ({ context, width, height }) => {
     context.fillStyle = '#fff'
     context.fillRect(0, 0, width, height)
@@ -41,7 +48,7 @@ const sketch = () => {
     for (let i = 0; i < Math.ceil(DIMENSIONS[0] / unitSize); i ++) {
       for (let j = 0; j < Math.ceil(DIMENSIONS[1] / unitSize); j ++) {
         context.translate(i * unitSize, j * unitSize)
-        random.value() < 0.01 ? drawScissors(context) : drawX(context)
+        randomInstance.value() < 0.01 ? drawScissors(context, colors) : drawX(context)
         context.resetTransform()
       }
     }
